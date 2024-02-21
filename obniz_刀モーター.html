@@ -1,0 +1,36 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/obniz@3.24.0/obniz.js"></script>
+  <script type="text/javascript">
+    let obniz = new Obniz("0033-9794");  //自分のobnizの番号に書き換えて下さい
+    let servo;  // servo変数をグローバルに宣言
+    
+    obniz.onconnect = async function () {
+      servo = obniz.wired("ServoMotor", {gnd:0,vcc:1,signal:2});  // ServoMotorPeripheral を使用する
+      servo.angle(135);
+      $('#button').click(async function(){  // clickイベントハンドラをasync関数に変更
+        let currentAngle=servo.angle();
+        while (currentAngle !== 45 && currentAngle !== 135) {
+          await obniz.wait(100); // 100ミリ秒待機
+          currentAngle = servo.angle();
+        }
+        
+        // サーボが目標角度に到達したら次の動作を実行
+        if (currentAngle === 45) {
+          //サーボを左回転(中心90°から左に45°)
+          servo.angle(135);
+        } else {
+          //サーボを右回転(中心90°から右に45°)
+          servo.angle(45);
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+  <div id="obniz-debug"></div>
+  <h1>Webプログラミング入門(obniz)</h1>
+  <button id="button">モーター起動！</button>
+</body>
+</html>
